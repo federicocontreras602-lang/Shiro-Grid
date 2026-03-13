@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Camisetas - Compra y Pide por Correo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #999;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .product-sizes {
+            margin-bottom: 1rem;
+        }
+
+        .size-btn {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .size-btn:hover,
+        .size-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .order-form {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .qty-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .total {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .order-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .order-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .order-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .products {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>👕 Tienda de Camisetas</h1>
+            <p>Camisetas de Calidad Premium - ¡Pide por Correo!</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="products" id="products">
+            <div class="product-card" data-price="25.00" data-name="Camiseta Blanca Clásica">
+                <div class="product-image">👕</div>
+                <div class="product-info">
+                    <h3 class="product-title">Camiseta Blanca Clásica</h3>
+                    <div class="product-price">$25.00</div>
+                    <div class="product-sizes">
+                        <span class="size-btn" data-size="S">S</span>
+                        <span class="size-btn" data-size="M">M</span>
+                        <span class="size-btn" data-size="L">L</span>
+                        <span class="size-btn" data-size="XL">XL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" data-price="28.00" data-name="Camiseta Negra con Gráfico">
+                <div class="product-image">⚡</div>
+                <div class="product-info">
+                    <h3 class="product-title">Camiseta Negra con Gráfico</h3>
+                    <div class="product-price">$28.00</div>
+                    <div class="product-sizes">
+                        <span class="size-btn" data-size="S">S</span>
+                        <span class="size-btn" data-size="M">M</span>
+                        <span class="size-btn" data-size="L">L</span>
+                        <span class="size-btn" data-size="XL">XL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card" data-price="32.00" data-name="Camiseta Premium de Algodón">
+                <div class="product-image">🌟</div>
+                <div class="product-info">
+                    <h3 class="product-title">Camiseta Premium de Algodón</h3>
+                    <div class="product-price">$32.00</div>
+                    <div class="product-sizes">
+                        <span class="size-btn" data-size="S">S</span>
+                        <span class="size-btn" data-size="M">M</span>
+                        <span class="size-btn" data-size="L">L</span>
+                        <span class="size-btn" data-size="XL">XL</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="order-form">
+            <h2>📬 Pedido por Correo</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="name">Nombre Completo *</label>
+                    <input type="text" id="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico *</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Dirección de Envío *</label>
+                    <textarea id="address" rows="4" placeholder="Calle, número, ciudad, código postal, país" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Producto Seleccionado</label>
+                    <div id="selectedProduct">No hay producto seleccionado</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Talla</label>
+                    <div id="selectedSize">-</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <div class="quantity">
+                        <button type="button" class="qty-btn" id="decreaseQty" title="Restar">-</button>
+                        <input type="number" id="quantity" value="1" min="1" max="10">
+                        <button type="button" class="qty-btn" id="increaseQty" title="Sumar">+</button>
+                    </div>
+                </div>
+
+                <div class="total">
+                    <div>Total: $<span id="totalPrice">0.00</span></div>
+                </div>
+
+                <button type="submit" class="order-btn" id="orderBtn" disabled>Realizar Pedido</button>
+                <div class="success-message" id="successMessage">
+                    ✅ ¡Pedido realizado exitosamente! Te enviaremos un correo de confirmación pronto.
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Tienda de Camisetas. Todos los derechos reservados. | ¡Envío rápido por correo mundial!</p>
+        </div>
+    </footer>
+
+    <script>
+        let selectedProduct = null;
+        let selectedSize = null;
+
+        // Selección de producto
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.product-card').forEach(c => c.style.border = 'none');
+                card.style.border = '3px solid #667eea';
+                
+                selectedProduct = {
+                    name: card.dataset.name,
+                    price: parseFloat(card.dataset.price)
+                };
+                
+                updateSelectedProduct();
+                updateTotal();
+            });
+        });
+
+        // Selección de talla
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('size-btn')) {
+                e.target.parentElement.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedSize = e.target.dataset.size;
+                updateSelectedProduct();
+            }
+        });
+
+        // Controles de cantidad
+        document.getElementById('increaseQty').addEventListener('click', () => {
+            const qty = document.getElementById('quantity');
+            qty.value = Math.min(parseInt(qty.value) + 1, 10);
+            updateTotal();
+        });
+
+        document.getElementById('decreaseQty').addEventListener('click', () => {
+            const qty = document.getElementById('quantity');
+            qty.value = Math.max(parseInt(qty.value) - 1, 1);
+            updateTotal();
+        });
+
+        function updateSelectedProduct() {
+            const productDiv = document.getElementById('selectedProduct');
+            const sizeDiv = document.getElementById('selectedSize');
+            
+            if (selectedProduct) {
+                productDiv.textContent = selectedProduct.name;
+            }
+            if (selectedSize) {
+                sizeDiv.textContent = selectedSize;
+            }
+            
+            const orderBtn = document.getElementById('orderBtn');
+            orderBtn.disabled = !(selectedProduct && selectedSize);
+        }
+
+        function updateTotal() {
+            if (selectedProduct) {
+                const qty = parseInt(document.getElementById('quantity').value);
+                const total = (selectedProduct.price * qty).toFixed(2);
+                document.getElementById('totalPrice').textContent = total;
+            }
+        }
+
+        // Envío del formulario
+        document.getElementById('orderForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (selectedProduct && selectedSize) {
+                // Simular procesamiento del pedido
+                document.getElementById('orderBtn').textContent = 'Procesando...';
+                document.getElementById('orderBtn').disabled = true;
+                
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('orderBtn').textContent = '¡Pedido Realizado!';
+                    document.getElementById('orderBtn').style.background = '#28a745';
+                }, 2000);
+            }
+        });
+
+        // Actualización en tiempo real de cantidad
+        document.getElementById('quantity').addEventListener('input', updateTotal);
+    </script>
+</body>
+</html>
